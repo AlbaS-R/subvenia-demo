@@ -7,6 +7,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 // Fix: Import IconButton to use for toggling the language switcher
 import { IconButton } from './common/IconButton';
+import { useAuth } from '../contexts/AuthContext';
 
 const RECENT_EMAILS_KEY = 'grantswin_recent_emails';
 
@@ -20,6 +21,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [recentEmails, setRecentEmails] = useState<string[]>([]);
   const { theme } = useTheme();
+  const { mockLogin } = useAuth();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const langMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -41,8 +43,8 @@ const Login: React.FC = () => {
     localStorage.setItem(RECENT_EMAILS_KEY, JSON.stringify(updated));
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault();
     setLoading(true);
     setError(null);
     try {
@@ -135,7 +137,7 @@ const Login: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={handleLogin}
+                    onClick={() => mockLogin()}
                     disabled={loading}
                     className="w-full py-6 rounded-[2rem] text-primary-foreground text-2xl font-black uppercase tracking-widest shadow-[0_20px_50px_rgba(68,237,204,0.3)] hover:shadow-[0_25px_60px_rgba(68,237,204,0.4)] transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-4 mb-8"
                     style={{ background: '#44edcc' }}
@@ -143,6 +145,8 @@ const Login: React.FC = () => {
                     <span>{loading ? 'Iniciando...' : 'Entrar a la Demo'}</span>
                     <span className="material-symbols-outlined text-3xl">rocket_launch</span>
                   </button>
+
+                  {error && <p className="text-sm text-red-400 mb-6 font-bold bg-red-400/10 p-3 rounded-xl border border-red-400/20">{error}</p>}
 
                   <button 
                     onClick={() => setView('login')}

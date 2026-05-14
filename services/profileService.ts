@@ -5,6 +5,58 @@ import type { UserProfile, FindData, UserProject } from '../types';
 export const profileService = {
     // Obtener perfiles del usuario actual (Array)
     async getUserProfiles(): Promise<UserProfile[]> {
+        if (localStorage.getItem('subvenia_mock_user')) {
+            const localData = localStorage.getItem('subvenia_mock_profiles');
+            const profiles = localData ? JSON.parse(localData) : [];
+
+            if (profiles.length === 0) {
+                const demoProfiles: UserProfile[] = [
+                    {
+                        id: 'demo-profile-1',
+                        user_id: 'mock-demo-user-id',
+                        company_name: 'EcoEnergy Solutions S.L.',
+                        website: 'https://ecoenergy.example.com',
+                        nif_vat: 'B12345678',
+                        tipo_entidad: 'Pyme',
+                        sector_principal: 'Energía',
+                        description: 'Desarrollo de paneles solares de alta eficiencia y sistemas de almacenamiento energético.',
+                        palabras_clave_es: 'Energía solar, Fotovoltaica, Baterías, Renovables',
+                        palabras_clave_en: 'Solar energy, Photovoltaics, Batteries, Renewables',
+                        last_modified: new Date().toISOString()
+                    },
+                    {
+                        id: 'demo-profile-2',
+                        user_id: 'mock-demo-user-id',
+                        company_name: 'BioTech Innovate',
+                        website: 'https://biotech.example.com',
+                        nif_vat: 'A87654321',
+                        tipo_entidad: 'Startup',
+                        sector_principal: 'Salud',
+                        description: 'Investigación en biotecnología aplicada a la regeneración celular y medicina de precisión.',
+                        palabras_clave_es: 'Biotecnología, Salud, Medicina, Genética',
+                        palabras_clave_en: 'Biotechnology, Health, Medicine, Genetics',
+                        last_modified: new Date().toISOString()
+                    },
+                    {
+                        id: 'demo-profile-3',
+                        user_id: 'mock-demo-user-id',
+                        company_name: 'AgroSmart Digital',
+                        website: 'https://agrosmart.example.com',
+                        nif_vat: 'B45678912',
+                        tipo_entidad: 'Pyme',
+                        sector_principal: 'Agricultura',
+                        description: 'Digitalización del sector agrícola mediante sensores IoT y análisis de datos para optimización de riego.',
+                        palabras_clave_es: 'Agricultura, IoT, Sensores, Digitalización',
+                        palabras_clave_en: 'Agriculture, IoT, Sensors, Digitalization',
+                        last_modified: new Date().toISOString()
+                    }
+                ];
+                localStorage.setItem('subvenia_mock_profiles', JSON.stringify(demoProfiles));
+                return demoProfiles;
+            }
+            return profiles;
+        }
+
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return [];
 

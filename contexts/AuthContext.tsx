@@ -4,10 +4,12 @@ import { supabase } from '../supabase-client';
 import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  user: User | null;
+  user: User | any | null;
   session: Session | null;
   loading: boolean;
+  isMockUser: boolean;
   signOut: () => Promise<void>;
+  mockLogin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,11 +23,20 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | any | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMockUser, setIsMockUser] = useState(false);
 
   useEffect(() => {
+    // Check for mock session first
+    const savedMock = localStorage.getItem('subvenia_mock_user');
+    if (savedMock) {
+        setUser(JSON.parse(savedMock));
+        setIsMockUser(true);
+        setLoading(false);
+        return;
+    }
     let mounted = true;
 
     const initializeAuth = async () => {
@@ -102,11 +113,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    if (isMockUser) {
+        localStorage.removeItem('subvenia_mock_user');
+        setUser(null);
+        setIsMockUser(false);
+    } else {
+        await supabase.auth.signOut();
+    }
+  };
+
+  const mockLogin = () => {
+    const mockUser = {
+        id: 'mock-demo-user-id',
+        email: 'demo@subvenia.es',
+        user_metadata: { full_name: 'Usuario Demo' }
+    };
+    setUser(mockUser);
+    setIsMockUser(true);
+    localStorage.setItem('subvenia_mock_user', JSON.stringify(mockUser));
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isMockUser, signOut, mockLogin }}>
       {children}
     </AuthContext.Provider>
   );

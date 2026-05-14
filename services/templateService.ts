@@ -1,6 +1,6 @@
-
 import { BrandTemplate, TemplateConfig } from '../types';
 import { supabase } from '../supabase-client';
+import { getDefaultTemplate } from '../utils/defaultTemplates';
 
 const LOCAL_STORAGE_KEY = 'gw_find_corp_templates_library';
 
@@ -18,6 +18,37 @@ const saveLocalTemplates = (templates: BrandTemplate[]) => {
 export const templateService = {
     async getTemplates(): Promise<BrandTemplate[]> {
         try {
+            if (localStorage.getItem('subvenia_mock_user')) {
+                const localTemplates = getLocalTemplates();
+                if (localTemplates.length === 0) {
+                    // Inject demo templates
+                    const demo1: BrandTemplate = {
+                        id: 'demo-template-1',
+                        user_id: 'mock-demo-user-id',
+                        name: 'Identidad Corporativa Standard',
+                        config: getDefaultTemplate('demo@subvenia.es', 'es'),
+                        last_modified: new Date().toISOString()
+                    };
+
+                    const demo2Config = getDefaultTemplate('demo@subvenia.es', 'es');
+                    demo2Config.primaryColor = '#1e293b';
+                    demo2Config.coverLayout = 'classic-centered';
+                    demo2Config.coverTitle = 'INFORME DE ALTO IMPACTO';
+                    
+                    const demo2: BrandTemplate = {
+                        id: 'demo-template-2',
+                        user_id: 'mock-demo-user-id',
+                        name: 'Identidad Ejecutiva Premium',
+                        config: demo2Config,
+                        last_modified: new Date().toISOString()
+                    };
+
+                    saveLocalTemplates([demo1, demo2]);
+                    return [demo1, demo2];
+                }
+                return localTemplates;
+            }
+
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return getLocalTemplates();
 

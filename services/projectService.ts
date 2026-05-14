@@ -4,6 +4,51 @@ import type { FindData, Project } from '../types';
 
 export const projectService = {
   async getProjects(): Promise<Project[]> {
+    if (localStorage.getItem('subvenia_mock_user')) {
+        const localData = localStorage.getItem('subvenia_mock_projects');
+        const projects = localData ? JSON.parse(localData) : [];
+        
+        if (projects.length === 0) {
+            const demoProject: Project = {
+                id: 'demo-project-id',
+                name: 'Proyecto Demo - Empresa de Tecnología',
+                lastModified: new Date().toISOString(),
+                websiteUrl: 'https://subvenia.es',
+                result: null,
+                currentStage: 2,
+                maxReachedStage: 2,
+                findData: {
+                    jobId: null,
+                    stage1: {
+                        companyName: 'Tecnología Demo S.L.',
+                        websiteUrl: 'https://subvenia.es',
+                        pastedText: '',
+                        reportLanguage: 'es',
+                        keywords: { core: ['IA', 'Software'], horizontal: [], action: [] },
+                        business_summary: 'Desarrollo de software de inteligencia artificial.',
+                        description: 'Empresa tecnológica especializada en soluciones de automatización.',
+                        sectorPrincipal: 'Tecnología',
+                        sectoresSecundarios: [],
+                        targetSectors: [],
+                        keyServices: [],
+                        main_location: 'Madrid',
+                        fundingTypes: {},
+                        projectDetails: {},
+                        searchStartDate: '',
+                        searchEndDate: ''
+                    },
+                    stage2: {
+                        result: []
+                    },
+                    stage4_searchResults: []
+                }
+            };
+            localStorage.setItem('subvenia_mock_projects', JSON.stringify([demoProject]));
+            return [demoProject];
+        }
+        return projects;
+    }
+
     const { data, error } = await supabase
       .from('find_corp_projects')
       .select('*')
@@ -40,6 +85,32 @@ export const projectService = {
   },
 
   async createProject(initialData: FindData, userId: string): Promise<string> {
+    const today = new Date().toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    if (userId === 'mock-demo-user-id') {
+        const id = crypto.randomUUID();
+        const projects = await this.getProjects();
+        const projectNumber = projects.length + 1;
+        const initialName = `Proyecto ${projectNumber} - ${today}`;
+
+        const newProject: Project = {
+            id,
+            name: initialName,
+            lastModified: new Date().toISOString(),
+            websiteUrl: initialData.stage1?.websiteUrl || '',
+            result: null,
+            currentStage: 1,
+            maxReachedStage: 1,
+            findData: initialData
+        };
+        localStorage.setItem('subvenia_mock_projects', JSON.stringify([newProject, ...projects]));
+        return id;
+    }
+
     // Obtener el conteo actual para generar el número de proyecto
     const { count, error: countError } = await supabase
       .from('find_corp_projects')
@@ -49,12 +120,6 @@ export const projectService = {
     if (countError) throw countError;
 
     const projectNumber = (count || 0) + 1;
-    const today = new Date().toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-
     const initialName = `Proyecto ${projectNumber} - ${today}`;
 
     const { data, error } = await supabase
@@ -75,6 +140,22 @@ export const projectService = {
   },
 
   async updateProject(id: string, findData: FindData, currentStage: number, maxReachedStage: number): Promise<void> {
+    if (localStorage.getItem('subvenia_mock_user')) {
+        const projects = await this.getProjects();
+        const index = projects.findIndex(p => p.id === id);
+        if (index !== -1) {
+            projects[index] = {
+                ...projects[index],
+                findData,
+                currentStage,
+                maxReachedStage,
+                lastModified: new Date().toISOString()
+            };
+            localStorage.setItem('subvenia_mock_projects', JSON.stringify(projects));
+        }
+        return;
+    }
+
     const { error } = await supabase
       .from('find_corp_projects')
       .update({
