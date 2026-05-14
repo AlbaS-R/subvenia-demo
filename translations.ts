@@ -27,10 +27,10 @@ export const translations: any = {
       switchToDark: 'Cambiar a modo oscuro',
       switchToLight: 'Cambiar a modo claro'
     },
-    introScreen: { 
-      title: 'Subvenia', 
-      subtitle: 'Convertimos vuestra base de socios en oportunidades reales de financiación: automáticas, escalables y medibles.', 
-      cta: 'Demo con números',
+    introScreen: {
+      title: 'Subvenia',
+      subtitle: 'Convertimos vuestra base de socios en oportunidades reales de financiación: automáticas, escalables y medibles.',
+      cta: 'Iniciar Demo',
       step1_title: 'Subís vuestra base',
       step1_desc: 'CSV o Excel de socios y empresas: en minutos queda lista para cruzarse con ayudas vivas.',
       step2_title: 'Cruce automático total',
@@ -250,9 +250,9 @@ export const translations: any = {
   ca: {
     languages: { es: 'Espanyol', ca: 'Català', en: 'Anglès', fr: 'Francès', de: 'Alemany', it: 'Italià' },
     general: { step: 'Pas', version: 'Versió', generating: 'Generant...', generate: 'Generar', save: 'Desar', edit: 'Editar', use: 'Utilitzar', cancel: 'Cancel·lar', confirm: 'Confirmar', downloadPdf: 'Descarregar PDF', back: 'Enrere', delete: 'Eliminar' },
-    introScreen: { 
+    introScreen: {
       title: 'Subvenia',
-      subtitle: 'La plataforma intel·ligent per a la gestió d\'ajudes i licitacions a escala.', 
+      subtitle: 'La plataforma intel·ligent per a la gestió d\'ajudes i licitacions a escala.',
       cta: 'Iniciar nova auditoria',
       step1_title: 'Sincronització de Perfils',
       step1_desc: 'Accedeix a la base de dades dels teus clients i selecciona les entitats que vols auditar avui.',
